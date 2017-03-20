@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Camera name="DKU_MV_COUGAR_VIEW_001">
+    <Geometry dpx="0.01725" dpy="0.023" dx="0.023" dy="0.023" height="960" ncx="960" nfx="1280" width="1280" />
+    <Intrinsic cx="259.089" cy="203.648" focal="222.396" kappa1="-0.0001245" sx="0.75246" />
+    <Extrinsic rx="1.7313" ry="-0.293948" rz="-0.0277201" tx="3159.76" ty="3817.62" tz="65371.8" />
+</Camera>

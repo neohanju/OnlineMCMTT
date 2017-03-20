@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="GraphSolver.cpp">
+      <Filter>3D Association\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Main Control Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraModel.cpp">
+      <Filter>Helpers\Calibration</Filter>
+    </ClCompile>
+    <ClCompile Include="pugixml.cpp">
+      <Filter>Helpers\XML parser</Filter>
+    </ClCompile>
+    <ClCompile Include="SCMTTracker.cpp">
+      <Filter>2D Tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="types_3D.cpp">
+      <Filter>Haanju Library\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Point3DSmoother.cpp">
+      <Filter>Haanju Library\Smoother</Filter>
+    </ClCompile>
+    <ClCompile Include="SGSmoother.cpp">
+      <Filter>Haanju Library\Smoother</Filter>
+    </ClCompile>
+    <ClCompile Include="MainController.cpp">
+      <Filter>Main Control Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="HungarianMethod.cpp">
+      <Filter>Haanju Library\Hungarian Method</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManager.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameGrabber.cpp">
+      <Filter>Frame Grabbing</Filter>
+    </ClCompile>
+    <ClCompile Include="haanju_string.cpp">
+      <Filter>Haanju Library</Filter>
+    </ClCompile>
+    <ClCompile Include="haanju_math.cpp">
+      <Filter>Haanju Library</Filter>
+    </ClCompile>
+    <ClCompile Include="haanju_fileIO.cpp">
+      <Filter>Haanju Library</Filter>
+    </ClCompile>
+    <ClCompile Include="haanju_matOperations.cpp">
+      <Filter>Haanju Library</Filter>
+    </ClCompile>
+    <ClCompile Include="hannju_visualize.cpp">
+      <Filter>Haanju Library</Filter>
+    </ClCompile>
+    <ClCompile Include="haanju_misc.cpp">
+      <Filter>Haanju Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Associator3D.cpp">
+      <Filter>3D Association</Filter>
+    </ClCompile>
+    <ClCompile Include="GUIManager.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="haanju_3D.cpp">
+      <Filter>Haanju Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Evaluator.cpp">
+      <Filter>Evaluator</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="2D Tracking">
+      <UniqueIdentifier>{c7ca4b5a-9e94-4605-862f-437ebc76a437}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3D Association">
+      <UniqueIdentifier>{4109b421-0608-471e-b3ac-03fb3535755a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3D Association\Solver">
+      <UniqueIdentifier>{943f561f-877c-44e5-a57e-4eefd04dfd24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Control Modules">
+      <UniqueIdentifier>{f87bf106-6d31-4f0f-9958-481c394db103}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers">
+      <UniqueIdentifier>{e502e492-af16-49fa-bf5a-5887c74cd6ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\XML parser">
+      <UniqueIdentifier>{b66f6103-f8f7-41f0-83c7-a82fa4d177d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\Calibration">
+      <UniqueIdentifier>{57b225b7-e800-4bd6-a881-83f25b5ec174}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{b9b6f8f0-5701-4986-b949-f59310c223b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Haanju Library">
+      <UniqueIdentifier>{b31b04d2-edc3-462a-8d0b-127bbb52c1ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Haanju Library\Smoother">
+      <UniqueIdentifier>{6577c962-7e7c-42ef-bf00-47bd006b0ad0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Haanju Library\Types">
+      <UniqueIdentifier>{3bae7874-3697-4eb4-8089-f06cddf2fc36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Haanju Library\Hungarian Method">
+      <UniqueIdentifier>{29a67d71-235c-43d7-ad30-70c47ea37bcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Frame Grabbing">
+      <UniqueIdentifier>{7a824e0b-7474-4143-bbf4-4a71aef062fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{24d426ec-8051-4357-ad94-d66c0b772c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Evaluator">
+      <UniqueIdentifier>{7cdef428-456b-4e95-a447-655cedc74ecf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GraphSolver.h">
+      <Filter>3D Association\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraModel.h">
+      <Filter>Helpers\Calibration</Filter>
+    </ClInclude>
+    <ClInclude Include="pugiconfig.hpp">
+      <Filter>Helpers\XML parser</Filter>
+    </ClInclude>
+    <ClInclude Include="pugixml.hpp">
+      <Filter>Helpers\XML parser</Filter>
+    </ClInclude>
+    <ClInclude Include="SCMTTracker.h">
+      <Filter>2D Tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="types.hpp">
+      <Filter>Haanju Library\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Point3DSmoother.h">
+      <Filter>Haanju Library\Smoother</Filter>
+    </ClInclude>
+    <ClInclude Include="SGSmoother.h">
+      <Filter>Haanju Library\Smoother</Filter>
+    </ClInclude>
+    <ClInclude Include="haanju_matOperations.hpp">
+      <Filter>Haanju Library</Filter>
+    </ClInclude>
+    <ClInclude Include="haanju_misc.hpp">
+      <Filter>Haanju Library</Filter>
+    </ClInclude>
+    <ClInclude Include="haanju_visualize.hpp">
+      <Filter>Haanju Library</Filter>
+    </ClInclude>
+    <ClInclude Include="MainController.h">
+      <Filter>Main Control Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="HungarianMethod.h">
+      <Filter>Haanju Library\Hungarian Method</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManager.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameGrabber.h">
+      <Filter>Frame Grabbing</Filter>
+    </ClInclude>
+    <ClInclude Include="types_3D.h">
+      <Filter>Haanju Library\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="haanju_string.hpp">
+      <Filter>Haanju Library</Filter>
+    </ClInclude>
+    <ClInclude Include="haanju_math.hpp">
+      <Filter>Haanju Library</Filter>
+    </ClInclude>
+    <ClInclude Include="haanju_fileIO.hpp">
+      <Filter>Haanju Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Associator3D.h">
+      <Filter>3D Association</Filter>
+    </ClInclude>
+    <ClInclude Include="GUIManager.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="haanju_3D.hpp">
+      <Filter>Haanju Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Evaluator.h">
+      <Filter>Evaluator</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="data\settings.xml">
+      <Filter>Data</Filter>
+    </Xml>
+  </ItemGroup>
+</Project>
