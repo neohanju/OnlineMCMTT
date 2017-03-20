@@ -252,5 +252,5 @@ paket-files/
 *.sln.iml
 
 # dataset folders
-./dataset/PETS2009.S2.L1/
-./dataset/PILSNU/
+OnlineMCMTT/dataset/PETS2009.S2.L1/
+OnlineMCMTT/dataset/PILSNU/
