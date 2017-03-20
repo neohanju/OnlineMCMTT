@@ -1,5 +1,5 @@
-# Online Multiple Camera Multiple Target Tracking (MCMTT)
-
+Online Multiple Camera Multiple Target Tracking (MCMTT)
+=============
 
 This repository is a Visual C++ implementation of  [Online Scheme for Multiple Camera Multiple Target Tracking Based on Multiple Hypothesis Tracking](http://ieeexplore.ieee.org/document/7517399/), but with some legacy codes like frame grabbing with a commercial camera. The code runs best under a multi-core framework.
 
@@ -19,6 +19,5 @@ Notice
 ------------
 - 2017.03.21: There is something wrong at the evaluation code. So, don't trust the evaluation result.
 
-()()
-
+()()  
 ('')HAANJU.YOO
