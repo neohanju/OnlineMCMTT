@@ -56,8 +56,7 @@
       path="dataset/PETS2009.S2.L1"
       start_frame="0"
       end_frame="794"     
-      />
-      <!--end_frame="239" -->
+      />      
     <Camera
       camera_ids="1,5,7"
       frame_rate="7"
@@ -98,9 +97,8 @@
     <Dataset
       path="dataset/PILSNU"
       start_frame="0"
-      end_frame="10"
-      />
-    <!-- end_frame="332" -->
+      end_frame="332"
+      />    
     <Camera
       camera_ids="1,2,3,4"
       frame_rate="30"
