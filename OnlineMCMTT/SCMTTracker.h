@@ -146,10 +146,6 @@ private:
 	/* FOR DEBUGGING */
 	void VisualizeResult();
 
-	// TEMPORAL
-public:
-	void VisualizeLidarResult(cv::Mat _frameImage, hj::CTrackLidarResult _lidarResult);
-
 	//----------------------------------------------------------------
 	// VARIABLES
 	//----------------------------------------------------------------

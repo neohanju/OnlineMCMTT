@@ -35,7 +35,7 @@ unsigned int __stdcall GDTWork(void *data)
 	cv::Mat matFrame;
 	std::vector<hj::CDetection> vecDetections;
 	hj::CTrack2DResult cTrackResult;
-	hj::CTrackLidarResult cTrackLidarResult;
+	bool bStreamAlive = true;
 
 	hj::printf_debug("Thread for view %d is started\n", curCamIdx);
 	int cntFail = 0;
@@ -43,18 +43,23 @@ unsigned int __stdcall GDTWork(void *data)
 	while (gArrGDTThreadRun[curCamIdx] && pParams->pDataManager->GetRunFlag())
 	{
 		/* frame grabbing */
-		if (pParams->pGrabber->GrabFrame())
+		switch (pParams->pGrabber->GrabFrame())
 		{
+		case HJ_GR_NORMAL:
 			cntFail = 0;
-		}
-		else
-		{
+			break;
+		case HJ_GR_DATASET_ENDED:
+			bStreamAlive = false;
+			hj::printf_debug("  View %d: reach the end of the dataset\n", curCamIdx);
+			break;
+		default:
 			hj::printf_debug("  View %d: Fail to grab a frame\n", curCamIdx);
 			cntFail++;
-		}
+			break;
+		}		
 
 		/* grabbing failure */
-		if (cntFail > pParams->nMaxNumGrabFail)
+		if (cntFail > pParams->nMaxNumGrabFail || !bStreamAlive)
 		{
 			gArrGDTThreadRun[curCamIdx] = false;
 			pParams->pMainController->TerminateProcess(curCamIdx);
@@ -101,7 +106,7 @@ unsigned int __stdcall GDTWork(void *data)
 		{
 			hj::printf_debug("  >> suspend GDT thread no.%d because of buffer full\n", curCamIdx);
 			//SuspendThread(GetCurrentThread());
-			::Sleep(30);
+			::Sleep(3);
 		}
 		pParams->pDataManager->SetFrameImage(curCamIdx, matFrame, nFrameIndex);
 		pParams->pDataManager->SetTrack2DResult(curCamIdx, cTrackResult);
@@ -109,10 +114,7 @@ unsigned int __stdcall GDTWork(void *data)
 		/* request association work */
 		pParams->pMainController->WakeupAssociationThread(GDT_THREAD, nFrameIndex);
 		hj::printf_debug("  >> suspend GDT thread no.%d\n", curCamIdx);
-		SuspendThread(GetCurrentThread());
-
-		// TODO: modify below comment
-		//pParams->pTracker->VisualizeLidarResult(matFrame, cTrackLidarResult);
+		SuspendThread(GetCurrentThread());		
 
 		/* wrap-up */
 		matFrame.release();
@@ -140,8 +142,7 @@ struct stAssociationThreadParams
 	CMainController*   pMainController;
 	hj::CDataManager*  pDataManager;
 	hj::CAssociator3D* pAssociator;
-
-	bool bSocket;	
+	hj::CEvaluator*    pEvaluator;
 };
 static stAssociationThreadParams gStAssociationThreadParam;
 
@@ -152,131 +153,68 @@ unsigned int __stdcall AssociationWork(void *data)
 	std::vector<cv::Mat> vecMatFrames(pParams->nNumCams);
 	std::vector<hj::CTrack2DResult> vecTrack2DResults(pParams->nNumCams);
 	unsigned int nFrameIdx = 0;
+	unsigned int nFrameIdxRead = 0;
+	bool bEvaluate = pParams->pDataManager->GetEvaluateFlag();
 
 	hj::printf_debug("Thread for association is started\n");
 	while (gAssociationThreadRun && pParams->pDataManager->GetRunFlag())
 	{
 		for (int camIdx = 0; camIdx < pParams->nNumCams; camIdx++)
 		{
-			//while (pParams->pDataManager->GetRunFlag() &&
-			//	(!pParams->pDataManager->IsFrameBufferFull(camIdx)
-			//		|| !pParams->pDataManager->IsTrack2DBufferFull(camIdx)))
-
-			//if (!pParams->pDataManager->IsFrameBufferFull(camIdx)				
-			//	|| !pParams->pDataManager->IsTrack2DBufferFull(camIdx))
-			//{				
-			//	if (pParams->pMainController->WakeupGDTThreads())
-			//	{
-			//		hj::printf_debug("  >> suspend association thread\n");
-			//		SuspendThread(GetCurrentThread());
-			//	}
-			//	else
-			//	{
-			//		hj::printf_debug("  >> [WARNING] resume GDT thread is unavailable\n");
-			//		gAssociationThreadRun = false;
-			//		break;
-			//	}
-			//}
-
-			//if (pParams->pDataManager->GetLidarFlag() && !pParams->pDataManager->IsLidarBufferFUll(camIdx))
-			//{
-			//	if (pParams->pMainController->WakeupLidarThreads())
-			//	{
-			//		hj::printf_debug("  >> suspend association thread\n");
-			//		SuspendThread(GetCurrentThread());
-			//	}
-			//	else
-			//	{
-			//		hj::printf_debug("  >> [WARNING] resume lidar thread is unavailable\n");
-			//		gAssociationThreadRun = false;
-			//		break;
-			//	}
-			//}
+			while (!pParams->pDataManager->IsFrameBufferFull(camIdx)
+				|| !pParams->pDataManager->IsTrack2DBufferFull(camIdx))
+			{
+				if (!pParams->pDataManager->GetRunFlag()) { break; }
+				hj::printf_debug("  >> sleep association thread\n");
+				::Sleep(5);
+			}
 			
 			/* load inputs */
-			pParams->pDataManager->GetFrameImage(camIdx, vecMatFrames[camIdx], &nFrameIdx);
+			pParams->pDataManager->GetFrameImage(camIdx, vecMatFrames[camIdx], &nFrameIdxRead);
 			pParams->pDataManager->GetTrack2DResult(camIdx, &vecTrack2DResults[camIdx]);
 			
-			//// check frame indices syncronization
-			//if (0 == camIdx)
-			//{
-			//	nFrameIdx = nFrameIdxRead;
-			//}
-			//else if (nFrameIdx != nFrameIdxRead)
-			//{
-			//	hj::printf_debug("  >> [ERROR] frame indices mismatch\n");
-			//	gAssociationThreadRun = false;
-			//	pParams->pMainController->TerminateProcess(-1); // assign temporary ID for 'A' thread
-			//	break;
-			//}
+			// check frame indices syncronization
+			if (0 == camIdx)
+			{
+				nFrameIdx = nFrameIdxRead;
+			}
+			else if (nFrameIdx != nFrameIdxRead)
+			{
+				hj::printf_debug("  >> [ERROR] frame indices mismatch\n");
+				gAssociationThreadRun = false;
+				pParams->pMainController->TerminateProcess(-1); // assign temporary ID for 'A' thread
+				break;
+			}
 		}
 
 		// do association
 		hj::CTrack3DResult curResult = 
 			pParams->pAssociator->Run(vecTrack2DResults, vecMatFrames, nFrameIdx);
 
+		// evaluation
+		if (bEvaluate)
+		{
+			pParams->pEvaluator->SetResult(curResult);
+		}
+
 		/* request new frame/tracklets */
 		pParams->pMainController->WakeupGDTThreads();
 		SuspendThread(GetCurrentThread());
-	}
-	pParams->pAssociator->Finalize();
-
-	hj::printf_debug("Thread for association is terminated\n");	
-
-	return 0;
-}
-
-
-//----------------------------------------------------------------
-// GUI THREAD
-//----------------------------------------------------------------
-struct stGUIThreadParams
-{
-	hj::CGUIManager*  pGUIManager;
-	hj::CDataManager* pDataManager;
-	CMainController*  pMainController;
-	hj::CEvaluator*   pEvaluator;
-
-	bool bSocket;
-	bool bEvaluate;	
-};
-static stGUIThreadParams gStGUIThreadParams;
-
-unsigned int __stdcall GUIWork(void *data)
-{
-	stGUIThreadParams* pParams = (stGUIThreadParams*)data;
-	hj::CTrackLidarResult trackingResult;
-	hj::CTrackLidarResult sendingResult;
-
-	// TEMPORAL
-	int nCntLoop = 0;
-	const int numSocketSkip = 10;
-	int frameIdx = 0;
-	int socketIdx = 0;
-	bool bUpdated = false;
-
-	while (gGUIThreadRun)
-	{
-		pParams->pGUIManager->SetResult(trackingResult);
-		pParams->pGUIManager->DrawResult();
-		sendingResult = pParams->pGUIManager->GetUserDefinedResult(trackingResult);
-		pParams->pDataManager->SetGUIAssignResult(pParams->pGUIManager->GetAssignedIDs());
-
-		// evaluation
-		if (pParams->bEvaluate && bUpdated)
-		{
-			pParams->pEvaluator->SetResult(trackingResult, frameIdx++);
-			bUpdated = false;
-		}
+		hj::printf_debug("  >> suspend association thread\n");
 	}
 
 	// evaluate
-	pParams->pEvaluator->Evaluate();
-	pParams->pEvaluator->PrintResultToConsole();
-	pParams->pEvaluator->PrintResultToFile("D:/Workspace/ExperimentalResult/KOCCA/evaluate.txt");
-	pParams->pEvaluator->Finalize();
+	if (bEvaluate)
+	{		
+		pParams->pEvaluator->Evaluate();
+		pParams->pEvaluator->PrintResultToConsole();
+		pParams->pEvaluator->PrintResultToFile();
+		pParams->pEvaluator->Finalize();
+	}
 
-	pParams->pGUIManager->Finalize();
+	pParams->pAssociator->Finalize();
+
+	hj::printf_debug("Thread for association is terminated\n");	
 
 	return 0;
 }
@@ -340,9 +278,6 @@ bool CMainController::Initialize(std::string _strParamXMLPath)
 	// associator
 	cAssociator3D_.Initialize(cDataManager_.GetAssociate3DParams());
 
-	// GUI
-	cGUIManager_.Initialize(-5000, 5000, -5000, 5000);
-
 	// evaluator
 	if (bEvaluate_)
 	{
@@ -383,18 +318,10 @@ bool CMainController::Initialize(std::string _strParamXMLPath)
 	gStAssociationThreadParam.nNumCams        = numCameras_;
 	gStAssociationThreadParam.pMainController = this;
 	gStAssociationThreadParam.pDataManager    = &cDataManager_;
-	gStAssociationThreadParam.pAssociator     = &cAssociator3D_;	
+	gStAssociationThreadParam.pAssociator     = &cAssociator3D_;
+	gStAssociationThreadParam.pEvaluator      = &cEvaluator_;	
 	hAssoicationThread_ = (HANDLE)_beginthreadex(
 		0, 0, &AssociationWork, &gStAssociationThreadParam, CREATE_SUSPENDED, 0);
-
-	// GUI thread
-	gStGUIThreadParams.pDataManager    = &cDataManager_;
-	gStGUIThreadParams.pGUIManager     = &cGUIManager_;
-	gStGUIThreadParams.pMainController = this;
-	gStGUIThreadParams.pEvaluator      = &cEvaluator_;	
-	gStGUIThreadParams.bEvaluate       = bEvaluate_;
-	hGUIThread_ = (HANDLE)_beginthreadex(
-		0, 0, &GUIWork, &gStGUIThreadParams, 0, 0);
 	
 	bInit_      = true;
 	bSystemRun_ = true;
@@ -403,7 +330,6 @@ bool CMainController::Initialize(std::string _strParamXMLPath)
 
 	// locks
 	InitializeSRWLock(&lockGDT_);
-	InitializeSRWLock(&lockGUI_);
 	InitializeSRWLock(&lockFrameIdx_);
 
 	return true;
@@ -424,11 +350,6 @@ void CMainController::Finalize()
 			WaitForSingleObject(vecHGDTThreads_[camIdx], INFINITE);
 			CloseHandle(vecHGDTThreads_[camIdx]);
 		}
-
-		//// finalize modules
-		//vecFrameGrabbers_[camIdx].Finalize();
-		//if (bDetect_) { vecDetectors_[camIdx].Finalize(); }
-		//vecMultiTracker2Ds_[camIdx].Finalize();
 	}
 
 	// wait until the association thread is terminated
@@ -437,14 +358,6 @@ void CMainController::Finalize()
 	{
 		WaitForSingleObject(hAssoicationThread_, INFINITE);
 		CloseHandle(hAssoicationThread_);
-	}
-
-	// wait until the GUI thread is terminated
-	gGUIThreadRun = false;
-	if (NULL != hGUIThread_)
-	{
-		WaitForSingleObject(hGUIThread_, INFINITE);
-		CloseHandle(hGUIThread_);
 	}
 }
 
@@ -473,8 +386,7 @@ bool CMainController::TerminateProcess(int _nThreadID)
 	cDataManager_.SetRunFlag(false);
 
 	for (int camIdx = 0; camIdx < numCameras_; camIdx++)
-	{
-		//if (!gArrGDTThreadRun[camIdx]) { continue;  }
+	{		
 		gArrGDTThreadRun[camIdx] = false;
 		hj::printf_debug("  >> resume GDT thread no.%d\n", camIdx);
 		ResumeThread(vecHGDTThreads_[camIdx]);
@@ -561,12 +473,6 @@ bool CMainController::WakeupAssociationThread(HJ_THREAD_TYPE _threadType, unsign
 		return true;
 	}
 	return false;
-}
-
-
-bool CMainController::WakeupGUIThread()
-{
-	return true;
 }
 
 

@@ -47,7 +47,7 @@ namespace hj
 {
 
 enum DETECTION_TYPE { FULLBODY = 0, HEAD, PARTS };
-enum INPUT_SOURCE   { GRABBING = 0, PILSNU, DKU };
+enum INPUT_SOURCE   { GRABBING = 0, PILSNU, DKU, PETS };
 
 /////////////////////////////////////////////////////////////////////////
 // GEOMETRY TYPES

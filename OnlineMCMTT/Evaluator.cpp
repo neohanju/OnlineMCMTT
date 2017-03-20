@@ -3,6 +3,7 @@
 
 #define MAXIMUM_POINT_ERROR (2000.0)
 #define BOUNDARY_PROCESSING_ (true)
+#define GROUNT_TRUTH_FILE_NAME "ground_truth_XY.txt"
 
 namespace hj
 {
@@ -45,7 +46,9 @@ void CEvaluator::Initialize(stParamEvaluator _stParams)
 	FILE *fp;
 	try
 	{
-		fopen_s(&fp, this->m_stParams.strGroundTruthPath.c_str(), "r");
+		char strGroundTruthFilePath[128] = "";
+		sprintf_s(strGroundTruthFilePath, "%s/%s", this->m_stParams.strGroundTruthPath.c_str(), GROUNT_TRUTH_FILE_NAME);
+		fopen_s(&fp, strGroundTruthFilePath, "r");
 		assert(NULL != fp);
 		float tempFloat;
 
@@ -117,6 +120,41 @@ void CEvaluator::Finalize(void)
 	this->bInit = false;
 }
 
+void CEvaluator::SetResult(hj::CTrack3DResult &trackResult)
+{
+	unsigned int timeIdx = trackResult.frameIdx;
+
+	if (timeIdx > this->m_queueSavedResult.size()) { return; }
+	
+	this->m_queueSavedResult[timeIdx].clear();
+	for (int i = 0; i < trackResult.object3DInfos.size(); i++)
+	{		
+		hj::Point3D curPoint = trackResult.object3DInfos[i].recentPoints.back();
+		if ((BOUNDARY_PROCESSING_ && !this->m_rectCropZoneMargin.contain(hj::Point2D(curPoint.x, curPoint.y)))
+			|| (!BOUNDARY_PROCESSING_ && !this->m_rectCropZone.contain(hj::Point2D(curPoint.x, curPoint.y))))
+		{
+			continue;
+		}
+
+		// index management
+		int indexPos = 0;
+		std::deque<unsigned int>::iterator findIter = 
+			std::find(this->m_queueID.begin(), this->m_queueID.end(), trackResult.object3DInfos[i].id);
+
+		if (this->m_queueID.end() == findIter)
+		{
+			this->m_queueID.push_back(trackResult.object3DInfos[i].id);
+			indexPos = (int)this->m_queueID.size() - 1;
+		}
+		else
+		{
+			indexPos = (int)(findIter - this->m_queueID.begin());
+		}
+		this->m_queueSavedResult[timeIdx].push_back(std::make_pair(indexPos, curPoint));
+	}
+	this->m_nSavedResult++;
+}
+
 void CEvaluator::SetResult(hj::TrackSet &trackSet, unsigned int timeIdx)
 {
 	if (timeIdx > this->m_queueSavedResult.size()) { return; }
@@ -142,39 +180,6 @@ void CEvaluator::SetResult(hj::TrackSet &trackSet, unsigned int timeIdx)
 		if (this->m_queueID.end() == findIter)
 		{
 			this->m_queueID.push_back((*trackIter)->tree->id);
-			indexPos = (int)this->m_queueID.size() - 1;
-		}
-		else
-		{
-			indexPos = (int)(findIter - this->m_queueID.begin());
-		}
-		this->m_queueSavedResult[timeIdx].push_back(std::make_pair(indexPos, curPoint));
-	}
-	this->m_nSavedResult++;
-}
-
-void CEvaluator::SetResult(hj::CTrackLidarResult &trackResult, unsigned int timeIdx)
-{
-	if (timeIdx >= this->m_queueSavedResult.size()) { return; }
-
-	this->m_queueSavedResult[timeIdx].clear();
-	for (std::vector<hj::CObjectLidarInfo>::iterator objIter = trackResult.objectLidarInfos.begin();
-		objIter != trackResult.objectLidarInfos.end();
-		objIter++)
-	{
-		hj::Point3D curPoint = objIter->location * 2.0;
-		if ((BOUNDARY_PROCESSING_ && !this->m_rectCropZoneMargin.contain(hj::Point2D(curPoint.x, curPoint.y)))
-			|| (!BOUNDARY_PROCESSING_ && !this->m_rectCropZone.contain(hj::Point2D(curPoint.x, curPoint.y))))
-		{
-			continue;
-		}
-
-		// index management
-		int indexPos = 0;
-		std::deque<unsigned int>::iterator findIter = std::find(this->m_queueID.begin(), this->m_queueID.end(), objIter->id);
-		if (this->m_queueID.end() == findIter)
-		{
-			this->m_queueID.push_back(objIter->id);
 			indexPos = (int)this->m_queueID.size() - 1;
 		}
 		else
@@ -760,6 +765,24 @@ void CEvaluator::PrintResultToConsole()
 	//	this->m_stResult.fMOTA * 100, 
 	//	this->m_stResult.fMOTP * 100, 
 	//	this->m_stResult.fMOTAL * 100);
+}
+
+void CEvaluator::PrintResultToFile(void)
+{
+	FILE *fp;
+	try
+	{
+		char strFilePath[128] = "";
+		sprintf_s(strFilePath, "%s/evaluate.txt", this->m_stParams.strGroundTruthPath.c_str());
+		fopen_s(&fp, strFilePath, "w");
+		fprintf_s(fp, PrintResultToString().c_str());
+		fclose(fp);
+	}
+	catch (long dwError)
+	{
+		printf("[ERROR](PrintResultToFile) cannot open file! error code %d\n", dwError);
+		return;
+	}
 }
 
 void CEvaluator::PrintResultToFile(const char *strFilepathAndName)

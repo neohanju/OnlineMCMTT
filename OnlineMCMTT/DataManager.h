@@ -56,12 +56,10 @@ public:
 	bool GetFrameImage(const int _camIdx, cv::Mat &_receiver, unsigned int *_frameIdx = NULL);
 	bool GetDetectionResult(const int _camIdx, hj::DetectionSet *_receiver);
 	bool GetTrack2DResult(const int _camIdx, hj::CTrack2DResult *_receiver);
-	bool GetTrack3DResult(hj::CTrack3DResult *_receiver);
-	bool GetGUIAssignResult(std::vector<std::pair<int, int>> *_receiver);
+	bool GetTrack3DResult(hj::CTrack3DResult *_receiver);	
 
 	/* read functions */
-	std::vector<int> GetCameraIDs();
-	//hj::CCalibrationInfo* GetCalibInfoPt(int _camIdx);
+	std::vector<int> GetCameraIDs();	
 
 	bool GetDetectFlag();	
 	bool GetEvaluateFlag();
@@ -87,9 +85,8 @@ private:
 	hj::stParamEvaluator                  evaluatorParams_;
 	SRWLOCK lockParamAccess_;
 
-	bool bRealtimeOperation_;
-	bool bRecord_;
-	bool bDetect_;	
+	bool bRealtimeOperation_;	
+	bool bDetect_;
 	bool bEvaluate_;
 
 	std::string strInputSource_;

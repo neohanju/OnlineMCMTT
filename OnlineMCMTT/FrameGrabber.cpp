@@ -144,7 +144,7 @@ bool CFrameGrabber::Initialize(int _nID, stParamFrameGrabber &_stParams)
 		/* set image foler path */
 		strImageFoler_ = stParams_.strInputDir;
 
-		if (hj::PILSNU == stParams_.nInputSource)
+		if (hj::PILSNU == stParams_.nInputSource || hj::PETS == stParams_.nInputSource)
 		{
 			nInputType_ = HJ_READ_IMAGE;
 		}
@@ -236,11 +236,13 @@ bool CFrameGrabber::SetParameters(stParamFrameGrabber &_stParams)
 }
 
 
-bool CFrameGrabber::GrabFrame()
+HJ_GRAB_RESULT CFrameGrabber::GrabFrame()
 {
 	assert(bInit_);
 	
 	bool bGrabbed = false;
+	HJ_GRAB_RESULT resultCode = HJ_GR_NORMAL;
+
 	if (!matFrame_.empty())
 	{
 		matFramePrev_ = matFrame_.clone();
@@ -251,6 +253,7 @@ bool CFrameGrabber::GrabFrame()
 	if (HJ_READ_IMAGE == nInputType_)
 	{
 		bGrabbed = GrabImage(nCurrentFrameIndex_);
+		if (!bGrabbed) { resultCode = HJ_GR_DATASET_ENDED; }
 	}
 	else if (HJ_READ_IMAGE_TIME_FORMAT == nInputType_)
 	{
@@ -264,23 +267,28 @@ bool CFrameGrabber::GrabFrame()
 
 		//bGrabbed = GrabImage(timeGap);
 		bGrabbed = GrabImage((long)10);
+		if (!bGrabbed) { resultCode = HJ_GR_UNKNOWN_ERROR; }
 	}
 	else if (HJ_READ_VIDEO == nInputType_)
 	{
 		bGrabbed = GrabVideoFrame();
+		if (!bGrabbed) { resultCode = HJ_GR_UNKNOWN_ERROR; }
 	}
 	else if (HJ_CAM_MV_GIGE == nInputType_)
 	{		
 		bGrabbed = GrabMVGECamera();
+		if (!bGrabbed) { resultCode = HJ_GR_HARDWARE_FAIL; }
 	}
 
 	if (matFrame_.empty() || !bGrabbed)
 	{
-		if (!matFramePrev_.empty()) { matFrame_ = matFramePrev_.clone(); }
-		return false;
+		if (!matFramePrev_.empty())
+		{
+			matFrame_ = matFramePrev_.clone();
+		}
 	}
 
-	return true;
+	return resultCode;
 }
 
 

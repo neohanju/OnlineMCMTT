@@ -7,6 +7,7 @@
 #define PARAM_TAG_GRABBING "GRABBING"
 #define PARAM_TAG_PILSNU   "PILSNU"
 #define PARAM_TAG_DKU      "DKU"
+#define PARAM_TAG_PETS     "PETS"
 
 /* NODE NAMES */
 #define PARAM_TAG_PARAMETERS     "Parameters"
@@ -25,7 +26,6 @@
 // Operation
 #define PARAM_TAG_INPUT_SOURCE              "input_source"
 #define PARAM_TAG_REALTIME_OPERATION_TAG    "do_realtime_op"
-#define PARAM_TAG_RECORD_FLAG               "do_recording"
 #define PARAM_TAG_DETECT_FLAG               "do_detection"
 #define PARAM_TAG_EVALUATION_FLAG           "do_evaluation"
 #define PARAM_TAG_DETECTOR_PATH             "detector_path"
@@ -111,10 +111,11 @@
 #define PARAM_TAG_RESULT_TRAJECTORY_LENGTH "result_trajectory_length"
 #define PARAM_TAG_SHOW_TREE_ID             "show_tree_id"
 // Evaluation
-#define PARAM_TAG_CROP_XMIN "crop_xmin"
-#define PARAM_TAG_CROP_XMAX "crop_xmax"
-#define PARAM_TAG_CROP_YMIN "crop_ymin"
-#define PARAM_TAG_CROP_YMAX "crop_ymax"
+#define PARAM_TAG_CROP_XMIN   "crop_xmin"
+#define PARAM_TAG_CROP_XMAX   "crop_xmax"
+#define PARAM_TAG_CROP_YMIN   "crop_ymin"
+#define PARAM_TAG_CROP_YMAX   "crop_ymax"
+#define PARAM_TAG_CROP_MARGIN "crop_margin"
 
 
 namespace hj
@@ -135,9 +136,8 @@ CDataManager::~CDataManager()
 bool CDataManager::Initialize(std::string _strParameterFilePath)
 {
 	/* default values for each parameters */
-	bRealtimeOperation_ = false;
-	bDataReady_ = false;
-	bRecord_ = false;
+	bRealtimeOperation_ = false; // for read dataset with real processing time as a frame gab
+	bDataReady_ = false;	
 	bDetect_ = true;	
 	strCalibrationPath_ = "";
 	strDatasetPath_     = "";
@@ -611,29 +611,6 @@ bool CDataManager::GetTrack3DResult(hj::CTrack3DResult *_receiver)
 }
 
 
-bool CDataManager::GetGUIAssignResult(std::vector<std::pair<int, int>> *_receiver)
-{
-	bool result = true;
-	//------------------------------------------
-	AcquireSRWLockShared(&lockGUI_);
-	//------------------------------------------
-	try
-	{
-		*_receiver = vecAssignedIDtoRealID_;
-		bGUIBufferFull_ = false;
-	}
-	catch (int e)
-	{
-		hj::printf_debug("[Error] GetGUIAssignResult: %d\n", e);
-		result = false;
-	}
-	//------------------------------------------
-	ReleaseSRWLockShared(&lockGUI_);
-	//------------------------------------------
-	return result;
-}
-
-
 std::vector<int> CDataManager::GetCameraIDs()
 {
 	assert(bDataReady_);
@@ -742,6 +719,11 @@ bool CDataManager::ReadParametersFromXML(std::string _strFilepath)
 				stReadParamFrameGrabber.nInputSource = hj::PILSNU;
 				stReadParamFrameGrabber.bExistFrameRange = true;
 			}
+			else if (strInputSource_.find(PARAM_TAG_PETS) != std::string::npos)			
+			{
+				stReadParamFrameGrabber.nInputSource = hj::PETS;
+				stReadParamFrameGrabber.bExistFrameRange = true;
+			}
 			else // if (std::string::npos != strInputSource_.find(std::string(PARAM_TAG_DKU)))
 			{
 				stReadParamFrameGrabber.nInputSource = hj::DKU;
@@ -751,10 +733,6 @@ bool CDataManager::ReadParametersFromXML(std::string _strFilepath)
 		else if (!std::string(PARAM_TAG_REALTIME_OPERATION_TAG).compare(attrIter->name()))
 		{
 			bRealtimeOperation_ = attrIter->as_bool();
-		}
-		else if (!std::string(PARAM_TAG_RECORD_FLAG).compare(attrIter->name()))
-		{
-			bRecord_ = attrIter->as_bool();
 		}
 		else if (!std::string(PARAM_TAG_DETECT_FLAG).compare(attrIter->name()))
 		{
@@ -1171,7 +1149,11 @@ bool CDataManager::ReadParametersFromXML(std::string _strFilepath)
 					attrIter != nodeIter->attributes_end();
 					attrIter++)
 				{
-					if (0 == std::string(PARAM_TAG_CROP_XMIN).compare(attrIter->name()))
+					if (0 == std::string(PARAM_TAG_PATH).compare(attrIter->name()))
+					{
+						stReadParamEvaluate.strGroundTruthPath = attrIter->as_string();
+					}
+					else if (0 == std::string(PARAM_TAG_CROP_XMIN).compare(attrIter->name()))
 					{
 						xmin = attrIter->as_double();
 					}
@@ -1187,10 +1169,10 @@ bool CDataManager::ReadParametersFromXML(std::string _strFilepath)
 					{
 						ymax = attrIter->as_double();
 					}
-					else if (0 == std::string(PARAM_TAG_PATH).compare(attrIter->name()))
+					else if (0 == std::string(PARAM_TAG_CROP_MARGIN).compare(attrIter->name()))
 					{
-						stReadParamEvaluate.strGroundTruthPath = attrIter->as_string();
-					}
+						stReadParamEvaluate.cropZoneMargin = attrIter->as_double();
+					}					
 				}
 				stReadParamEvaluate.cropZone =
 					hj::Rect(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
@@ -1259,7 +1241,9 @@ bool CDataManager::ReadParametersFromXML(std::string _strFilepath)
 	}
 
 	/* evaluator */
-	evaluatorParams_.strGroundTruthPath = strDatasetPath_ + "/groundTruth/ground_truth_XY.txt";	
+	evaluatorParams_.strGroundTruthPath = strDatasetPath_ + "/" + stReadParamEvaluate.strGroundTruthPath;
+	evaluatorParams_.cropZone       = stReadParamEvaluate.cropZone;
+	evaluatorParams_.cropZoneMargin = stReadParamEvaluate.cropZoneMargin;
 
 	/* buffers */
 	vecMatInputFrameBuffer_.resize(stViewInfos_.nNumCameras);

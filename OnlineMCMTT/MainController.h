@@ -36,8 +36,7 @@ public:
 	bool TerminateProcess(int _nThreadID);
 
 	bool WakeupGDTThreads();
-	bool WakeupAssociationThread(HJ_THREAD_TYPE _threadType, unsigned int _frameIdx);
-	bool WakeupGUIThread();
+	bool WakeupAssociationThread(HJ_THREAD_TYPE _threadType, unsigned int _frameIdx);	
 
 private:
 
@@ -50,8 +49,7 @@ private:
 	hj::CDataManager                cDataManager_;	
 	std::vector<hj::CFrameGrabber>  vecFrameGrabbers_;	
 	std::vector<hj::CSCMTTracker>   vecMultiTracker2Ds_;
-	hj::CAssociator3D               cAssociator3D_;
-	hj::CGUIManager                 cGUIManager_;
+	hj::CAssociator3D               cAssociator3D_;	
 	hj::CEvaluator                  cEvaluator_;
 
 	volatile bool bInit_;
@@ -63,11 +61,10 @@ private:
 	bool bEvaluate_;
 
 	HANDLE vecHGDTThreads_[MAX_NUM_SAME_THREAD];
-	HANDLE hAssoicationThread_;
-	HANDLE hGUIThread_;
+	HANDLE hAssoicationThread_;	
 	std::atomic<int> nNumGDTResults_;
 	std::atomic<unsigned int> nFrameIdx_;
-	SRWLOCK lockGDT_, lockFrameIdx_, lockGUI_;
+	SRWLOCK lockGDT_, lockFrameIdx_;
 };
 
 //()()

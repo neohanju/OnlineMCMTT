@@ -486,16 +486,6 @@ CTrack3DResult CAssociator3D::Run(
 
 	queueTrackingResult_.push_back(currentResult);
 
-	///////////////////////////////////////////////////////////////////////////////
-	//// EVALUATION
-	///////////////////////////////////////////////////////////////////////////////
-	//for (int evalIdx = 0; evalIdx < (*vecEvaluator_).size(); evalIdx++)
-	//{
-	//	int timeDeferred = (int)nCurrentFrameIdx_ - (*vecEvaluator_)[evalIdx].second;
-	//	if (0 > timeDeferred) { continue; }
-	//	(*vecEvaluator_)[evalIdx].first.SetResult(queueTracksInBestSolution_, timeDeferred);
-	//}
-
 	if (bVisualizeResult_) { VisualizeResult(frameIdx); }
 
 	/////////////////////////////////////////////////////////////////////////////

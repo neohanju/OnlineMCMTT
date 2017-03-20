@@ -18,6 +18,14 @@ enum HJ_FRAME_INPUT_TYPE {
 	NUM_HJ_INPUT_TYPE          // number of input type
 };
 
+enum HJ_GRAB_RESULT {
+	HJ_GR_NORMAL = 0,
+	HJ_GR_HARDWARE_FAIL,
+	HJ_GR_DATASET_ENDED,
+	HJ_GR_UNKNOWN_ERROR,
+	NUM_HJ_GR
+};
+
 namespace hj
 {
 
@@ -35,7 +43,7 @@ public:
 	bool Finalize();
 	bool Reset();
 	bool SetParameters(stParamFrameGrabber &_stParams);
-	bool GrabFrame();
+	HJ_GRAB_RESULT GrabFrame();
 	int  GetFrameIndex() { return nCurrentFrameIndex_; }
 	cv::Mat GetFrame();
 

@@ -3,11 +3,10 @@
 <Parameters>
   <!-- parameters for basic operation -->
   <Operation
-    input_source="DKU_KOCCA_S1_ROTATE"
-    do_realtime_op="0"
-    do_recording="0"
+    input_source="PETS2009.S2.L1"
+    do_realtime_op="0"    
     do_detection="0"
-    do_evaluation="0"    
+    do_evaluation="1"    
     />
   <!-- setting for real-time grabbing -->
   <Setting name="GRABBING">
@@ -51,17 +50,17 @@
       path=""
       />
   </Setting>
-  <!-- setting for PILSNU dataset -->
-  <Setting name="PILSNU">
+  <!-- setting for PETS 2009 (S2.L1) dataset -->
+  <Setting name="PETS2009.S2.L1">
     <Dataset
-      path="dataset/PILSNU"
+      path="dataset/PETS2009.S2.L1"
       start_frame="0"
-      end_frame="100"     
+      end_frame="794"     
       />
       <!--end_frame="239" -->
     <Camera
-      camera_ids="1,2"
-      frame_rate="30"
+      camera_ids="1,5,7"
+      frame_rate="7"
       />
     <Calibration
       path="calibrationInfos"
@@ -86,23 +85,24 @@
       path=""
       />
     <Evaluation
-      path=""
-      crop_xmin="-3500"
-      crop_xmax="+3600"
-      crop_ymin="-1500"
-      crop_ymax="+4100"
+      path="groundTruth"
+      crop_xmin="-14069.6"
+      crop_xmax="+4981.3"
+      crop_ymin="-14274.0"
+      crop_ymax="+1733.5"
+      crop_margin="1000.0"
       />
   </Setting>
-  <!-- setting for PETS 2009 dataset -->
-  <Setting name="PETS2009.S2.L1">
+  <!-- setting for PILSNU dataset -->
+  <Setting name="PILSNU">
     <Dataset
-      path="dataset/PETS2009.S2.L1"
+      path="dataset/PILSNU"
       start_frame="0"
-      end_frame="399"
+      end_frame="10"
       />
-    <!--end_frame="239" -->
+    <!-- end_frame="332" -->
     <Camera
-      camera_ids="1,2"
+      camera_ids="1,2,3,4"
       frame_rate="30"
       />
     <Calibration
@@ -117,7 +117,7 @@
       nsm_overlap_ratio_2="0.25"
       />
     <Tracking2D
-      visualize="1"
+      visualize="0"
       image_rescale="0.5"
       detection_min_height="1400.0"
       detection_max_height="2300.0"
@@ -134,7 +134,7 @@
       max_height_difference="400"
       />
     <Association3D
-      visualize="0"
+      visualize="1"
       proc_window_size="10"
       K_best_size="20"
       max_num_tracks_in_optimization="1000"
@@ -152,7 +152,12 @@
       path=""
       />
     <Evaluation
-      path=""
+      path="groundTruth"
+      crop_xmin="-3000.0"
+      crop_xmax="+4000.0"
+      crop_ymin="-5000.0"
+      crop_ymax="+2000.0"
+      crop_margin="500.0"
       />
   </Setting>
 </Parameters>

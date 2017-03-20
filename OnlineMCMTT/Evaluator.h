@@ -36,14 +36,15 @@ public:
 	void Initialize(stParamEvaluator _stParams);
 	void Finalize(void);
 
-	void SetResult(hj::TrackSet &trackSet, unsigned int timeIdx);
-	void SetResult(hj::CTrackLidarResult &trackResult, unsigned int timeIdx);
+	void SetResult(hj::CTrack3DResult &trackResult);
+	void SetResult(hj::TrackSet &trackSet, unsigned int timeIdx);	
 	void LoadResultFromText(std::string strFilepath);
 	void Evaluate(void);
 	//stEvaluationResult EvaluateWithCrop(double cropMargin);
 
 	stEvaluationResult* GetEvaluationResult(void) { return &m_stResult; }
 	void PrintResultToConsole();
+	void PrintResultToFile(void);
 	void PrintResultToFile(const char *strFilepathAndName);
 	void PrintResultMatrix(const char *strFilepathAndName);
 	std::string PrintResultToString();
