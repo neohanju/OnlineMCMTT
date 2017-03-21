@@ -16,9 +16,6 @@ The following softwares and libraries are required:
 - Microsoft's Visual Studio 2015
 - OpenCV 3.1
 
-Notice
-------------
-- 2017.03.21: There is something wrong at the evaluation code. So, don't trust the evaluation result.
 
 ()()  
 (' ')HAANJU.YOO
