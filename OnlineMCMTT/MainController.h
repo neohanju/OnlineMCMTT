@@ -14,7 +14,6 @@
 #include "FrameGrabber.h"
 #include "SCMTTracker.h"
 #include "Associator3D.h"
-#include "GUIManager.h"
 #include "Evaluator.h"
 
 typedef enum { GDT_THREAD = 0, A_THREAD, GUI_THREAD } HJ_THREAD_TYPE;

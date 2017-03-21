@@ -191,6 +191,12 @@ unsigned int __stdcall AssociationWork(void *data)
 		hj::CTrack3DResult curResult = 
 			pParams->pAssociator->Run(vecTrack2DResults, vecMatFrames, nFrameIdx);
 
+		// DEBUG
+		if (14 == nFrameIdx)
+		{
+			int a = 0;
+		}
+
 		// evaluation
 		if (bEvaluate)
 		{

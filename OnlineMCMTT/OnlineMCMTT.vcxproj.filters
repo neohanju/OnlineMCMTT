@@ -58,9 +58,6 @@
     <ClCompile Include="Associator3D.cpp">
       <Filter>3D Association</Filter>
     </ClCompile>
-    <ClCompile Include="GUIManager.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
     <ClCompile Include="haanju_3D.cpp">
       <Filter>Haanju Library</Filter>
     </ClCompile>
@@ -107,9 +104,6 @@
     </Filter>
     <Filter Include="Frame Grabbing">
       <UniqueIdentifier>{7a824e0b-7474-4143-bbf4-4a71aef062fe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Interface">
-      <UniqueIdentifier>{24d426ec-8051-4357-ad94-d66c0b772c93}</UniqueIdentifier>
     </Filter>
     <Filter Include="Evaluator">
       <UniqueIdentifier>{7cdef428-456b-4e95-a447-655cedc74ecf}</UniqueIdentifier>
@@ -175,9 +169,6 @@
     </ClInclude>
     <ClInclude Include="Associator3D.h">
       <Filter>3D Association</Filter>
-    </ClInclude>
-    <ClInclude Include="GUIManager.h">
-      <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="haanju_3D.hpp">
       <Filter>Haanju Library</Filter>

@@ -164,7 +164,6 @@
     <ClCompile Include="Evaluator.cpp" />
     <ClCompile Include="FrameGrabber.cpp" />
     <ClCompile Include="GraphSolver.cpp" />
-    <ClCompile Include="GUIManager.cpp" />
     <ClCompile Include="haanju_3D.cpp" />
     <ClCompile Include="haanju_fileIO.cpp" />
     <ClCompile Include="haanju_math.cpp" />
@@ -188,7 +187,6 @@
     <ClInclude Include="Evaluator.h" />
     <ClInclude Include="FrameGrabber.h" />
     <ClInclude Include="GraphSolver.h" />
-    <ClInclude Include="GUIManager.h" />
     <ClInclude Include="haanju_3D.hpp" />
     <ClInclude Include="haanju_fileIO.hpp" />
     <ClInclude Include="haanju_math.hpp" />

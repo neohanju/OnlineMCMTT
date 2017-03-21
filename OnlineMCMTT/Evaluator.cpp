@@ -128,8 +128,8 @@ void CEvaluator::SetResult(hj::CTrack3DResult &trackResult)
 	
 	this->m_queueSavedResult[timeIdx].clear();
 	for (int i = 0; i < trackResult.object3DInfos.size(); i++)
-	{		
-		hj::Point3D curPoint = trackResult.object3DInfos[i].recentPoints.back();
+	{
+		hj::Point3D curPoint = trackResult.object3DInfos[i].recentPoints.front();
 		if ((BOUNDARY_PROCESSING_ && !this->m_rectCropZoneMargin.contain(hj::Point2D(curPoint.x, curPoint.y)))
 			|| (!BOUNDARY_PROCESSING_ && !this->m_rectCropZone.contain(hj::Point2D(curPoint.x, curPoint.y))))
 		{

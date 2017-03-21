@@ -675,64 +675,64 @@ CReconstruction CAssociator3D::PointReconstruction(CTrackletCombination &trackle
 	//-------------------------------------------------
 	switch (stParam_.nDetectionType)
 	{
-	case 1:
+	case 0:
 		// Full-body
-	{
-		std::vector<hj::Point2D_CamIdx> vecPointInfos;
-		for (int camIdx = 0; camIdx < nNumCameras_; camIdx++)
 		{
-			CTracklet2D *curTracklet = resultReconstruction.tracklet2Ds.get(camIdx);
-			if (NULL == curTracklet) { continue; }
+			std::vector<hj::Point2D_CamIdx> vecPointInfos;
+			for (int camIdx = 0; camIdx < nNumCameras_; camIdx++)
+			{
+				CTracklet2D *curTracklet = resultReconstruction.tracklet2Ds.get(camIdx);
+				if (NULL == curTracklet) { continue; }
 
-			//// 0.8 shrink
-			//hj::Rect curRect = curTracklet->rects.back();
-			//curRect.y = curRect.y + 0.1 * curRect.h;
-			//curRect.h *= 0.8;
+				//// 0.8 shrink
+				//hj::Rect curRect = curTracklet->rects.back();
+				//curRect.y = curRect.y + 0.1 * curRect.h;
+				//curRect.h *= 0.8;
 
-			curPoint = curTracklet->rects.back().reconstructionPoint();
-			vecPointInfos.push_back(hj::Point2D_CamIdx(curPoint, camIdx));
-			maxError += stParam_.dDetectionError 
-				* vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x);
-			//maxError = std::max(maxError,  stParam_.dDetectionError * (double)vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x));
+				curPoint = curTracklet->rects.back().reconstructionPoint();
+				vecPointInfos.push_back(hj::Point2D_CamIdx(curPoint, camIdx));
+				maxError += stParam_.dDetectionError 
+					* vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x);
+				//maxError = std::max(maxError,  stParam_.dDetectionError * (double)vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x));
 
-			// 3D position
-			resultReconstruction.rawPoints.push_back(curTracklet->currentLocation3D);
+				// 3D position
+				resultReconstruction.rawPoints.push_back(curTracklet->currentLocation3D);
 
-			//// sensitivity
-			//resultReconstruction.maxError += vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x);
+				//// sensitivity
+				//resultReconstruction.maxError += vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x);
+			}
+			//if (!stParam_.bConsiderSensitivity) { maxError = (double)stParam_.dMaxTrackletDistance / 2.0; }
+			resultReconstruction.maxError = maxError;
+			fDistance = this->NViewGroundingPointReconstruction(vecPointInfos, resultReconstruction.point);
 		}
-		//if (!stParam_.bConsiderSensitivity) { maxError = (double)stParam_.dMaxTrackletDistance / 2.0; }
-		resultReconstruction.maxError = maxError;
-		fDistance = this->NViewGroundingPointReconstruction(vecPointInfos, resultReconstruction.point);
-	}
-	break;
+		break;
 	default:
 		// Head
-	{
-		std::vector<hj::Line3D> vecBackprojectionLines;
-		for (int camIdx = 0; camIdx < nNumCameras_; camIdx++)
 		{
-			CTracklet2D *curTracklet = resultReconstruction.tracklet2Ds.get(camIdx);
-			if (NULL == curTracklet) { continue; }
+			std::vector<hj::Line3D> vecBackprojectionLines;
+			for (int camIdx = 0; camIdx < nNumCameras_; camIdx++)
+			{
+				CTracklet2D *curTracklet = resultReconstruction.tracklet2Ds.get(camIdx);
+				if (NULL == curTracklet) { continue; }
 
-			curPoint = curTracklet->rects.back().reconstructionPoint();
-			hj::Line3D curLine = curTracklet->backprojectionLines.back();
+				curPoint = curTracklet->rects.back().reconstructionPoint();
+				hj::Line3D curLine = curTracklet->backprojectionLines.back();
 
-			vecBackprojectionLines.push_back(curLine);
-			//maxError +=  stParam_.dDetectionError * vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x);
-			maxError = std::max(maxError, stParam_.dDetectionError * (double)vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x));
+				vecBackprojectionLines.push_back(curLine);
+				//maxError +=  stParam_.dDetectionError * vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x);
+				maxError = std::max(maxError, stParam_.dDetectionError * (double)vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x));
 
-			// 3D position
-			resultReconstruction.rawPoints.push_back(curTracklet->currentLocation3D);
+				// 3D position
+				resultReconstruction.rawPoints.push_back(curTracklet->currentLocation3D);
 
-			//// sensitivity
-			//resultReconstruction.maxError += vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x);
+				//// sensitivity
+				//resultReconstruction.maxError += vecMatProjectionSensitivity_[camIdx].at<float>((int)curPoint.y, (int)curPoint.x);
+			}
+			if (!stParam_.bConsiderSensitivity) { maxError = stParam_.dMaxTrackletDistance / 2.0; }
+			resultReconstruction.maxError = maxError;
+			fDistance = this->NViewPointReconstruction(vecBackprojectionLines, resultReconstruction.point);
 		}
-		if (!stParam_.bConsiderSensitivity) { maxError = stParam_.dMaxTrackletDistance / 2.0; }
-		resultReconstruction.maxError = maxError;
-		fDistance = this->NViewPointReconstruction(vecBackprojectionLines, resultReconstruction.point);
-	}
-	break;
+		break;
 	}
 	resultReconstruction.smoothedPoint = resultReconstruction.point;
 
@@ -3372,19 +3372,40 @@ void CAssociator3D::VisualizeResult(const unsigned int _frameIdx)
 		}
 
 		// DEBUG
-		hj::Point2D ptOrigin2D = WorldToImage(hj::Point3D(.0, .0, .0), camIdx);
-		hj::Point2D ptX_500    = WorldToImage(hj::Point3D( 500.0,    .0, .0), camIdx); ptX_500 *= rescale;
-		hj::Point2D ptY_500    = WorldToImage(hj::Point3D(    .0, 500.0, .0), camIdx); ptY_500 *= rescale;
-		hj::Point2D ptX_N500   = WorldToImage(hj::Point3D(-500.0,    .0, .0), camIdx); ptX_N500 *= rescale;
-		hj::Point2D ptY_N500   = WorldToImage(hj::Point3D(    .0,-500.0, .0), camIdx); ptY_N500 *= rescale;
-		cv::line(
-			vecMatCurrentFrames_[camIdx],
-			ptX_500.cv(), ptX_N500.cv(),			
-			cv::Scalar(255.0, .0, .0));
-		cv::line(
-			vecMatCurrentFrames_[camIdx],
-			ptY_500.cv(), ptY_N500.cv(),
-			cv::Scalar(0.0, .0, 255.0));
+		//hj::Point2D ptOrigin2D = WorldToImage(hj::Point3D(.0, .0, .0), camIdx);
+		//hj::Point2D ptX_500    = WorldToImage(hj::Point3D( 500.0,    .0, .0), camIdx); ptX_500 *= rescale;
+		//hj::Point2D ptY_500    = WorldToImage(hj::Point3D(    .0, 500.0, .0), camIdx); ptY_500 *= rescale;
+		//hj::Point2D ptX_N500   = WorldToImage(hj::Point3D(-500.0,    .0, .0), camIdx); ptX_N500 *= rescale;
+		//hj::Point2D ptY_N500   = WorldToImage(hj::Point3D(    .0,-500.0, .0), camIdx); ptY_N500 *= rescale;
+		// DEBUG: PETS with the first pedestrian
+		//hj::Point2D ptOrigin2D = WorldToImage(hj::Point3D(-3937, -7478, .0), camIdx);
+		//hj::Point2D ptX_500 = WorldToImage(hj::Point3D(-3937+2000.0, -7478, .0), camIdx); ptX_500 *= rescale;
+		//hj::Point2D ptY_500 = WorldToImage(hj::Point3D(-3937, -7478+2000.0, .0), camIdx); ptY_500 *= rescale;
+		//hj::Point2D ptX_N500 = WorldToImage(hj::Point3D(-3937-2000.0, -7478, .0), camIdx); ptX_N500 *= rescale;
+		//hj::Point2D ptY_N500 = WorldToImage(hj::Point3D(-3937, -7478-2000.0, .0), camIdx); ptY_N500 *= rescale;
+		//cv::line(
+		//	vecMatCurrentFrames_[camIdx],
+		//	ptX_500.cv(), ptX_N500.cv(),			
+		//	cv::Scalar(255.0, .0, .0));
+		//cv::line(
+		//	vecMatCurrentFrames_[camIdx],
+		//	ptY_500.cv(), ptY_N500.cv(),
+		//	cv::Scalar(0.0, .0, 255.0));
+
+		// DEBUG
+/*		hj::Point2D GT1 = WorldToImage(hj::Point3D(-5946.9,   -6908.1, .0), camIdx); GT1 *= rescale;
+		hj::Point2D GT2 = WorldToImage(hj::Point3D(-9367.1,   -6318.5, .0), camIdx); GT2 *= rescale;
+		hj::Point2D GT3 = WorldToImage(hj::Point3D(-10100.0, -10400.0, .0), camIdx); GT3 *= rescale;
+		hj::Point2D RES1 = WorldToImage(hj::Point3D(-4275.7,  -7568.4, .0), camIdx); RES1 *= rescale;
+		hj::Point2D RES2 = WorldToImage(hj::Point3D(-9128.4, -12900.0, .0), camIdx); RES2 *= rescale;
+		hj::Point2D RES3 = WorldToImage(hj::Point3D(-11500.0, -5644.3, .0), camIdx); RES3 *= rescale;
+		cv::circle(vecMatCurrentFrames_[camIdx], GT1.cv(), 5, cv::Scalar(255, 0, 0), 2);
+		cv::circle(vecMatCurrentFrames_[camIdx], GT2.cv(), 5, cv::Scalar(255, 0, 0), 2);
+		cv::circle(vecMatCurrentFrames_[camIdx], GT3.cv(), 5, cv::Scalar(255, 0, 0), 2);
+		cv::circle(vecMatCurrentFrames_[camIdx], RES1.cv(), 5, cv::Scalar(0, 0, 255), 2);
+		cv::circle(vecMatCurrentFrames_[camIdx], RES2.cv(), 5, cv::Scalar(0, 0, 255), 2);
+		cv::circle(vecMatCurrentFrames_[camIdx], RES3.cv(), 5, cv::Scalar(0, 0, 255), 2);	*/	
+		
 	}	
 	matTrackingResult_ = hj::MakeMatTile(&vecMatCurrentFrames_, 2, 2);
 
