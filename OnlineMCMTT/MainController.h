@@ -12,6 +12,7 @@
 #include <process.h>
 #include "DataManager.h"
 #include "FrameGrabber.h"
+#include "DetectorCrosstalk.hpp"
 #include "SCMTTracker.h"
 #include "Associator3D.h"
 #include "Evaluator.h"
@@ -46,6 +47,7 @@ public:
 
 private:
 	hj::CDataManager                cDataManager_;	
+	std::vector<CDetectorCrosstalk> vecDetectors_;
 	std::vector<hj::CFrameGrabber>  vecFrameGrabbers_;	
 	std::vector<hj::CSCMTTracker>   vecMultiTracker2Ds_;
 	hj::CAssociator3D               cAssociator3D_;	

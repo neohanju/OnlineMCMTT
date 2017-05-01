@@ -21,7 +21,7 @@ struct stGDTThreadParams
 	CMainController*    pMainController;
 	hj::CDataManager*   pDataManager;
 	hj::CFrameGrabber*  pGrabber;
-//	CDetectorCrosstalk* pDetector;  // TODO: replace this with a real detector
+	CDetectorCrosstalk* pDetector;
 	hj::CSCMTTracker*   pTracker;
 };
 static stGDTThreadParams gStGDTThreadParams[MAX_NUM_SAME_THREAD];
@@ -78,8 +78,7 @@ unsigned int __stdcall GDTWork(void *data)
 		/* object detection */		
 		if (pParams->bDetect)
 		{
-			// TODO: replace this with a real detector
-			//vecDetections = pParams->pDetector->Detect(matFrame, nFrameIndex);
+			vecDetections = pParams->pDetector->Detect(matFrame, nFrameIndex);
 		}
 		else
 		{			
@@ -124,7 +123,7 @@ unsigned int __stdcall GDTWork(void *data)
 	}
 
 	pParams->pGrabber->Finalize();
-	//if (pParams->bDetect) { pParams->pDetector->Finalize(); }
+	if (pParams->bDetect) { pParams->pDetector->Finalize(); }
 	pParams->pTracker->Finalize();
 
 	hj::printf_debug("Thread for view %d is terminated\n", curCamIdx);
@@ -191,12 +190,6 @@ unsigned int __stdcall AssociationWork(void *data)
 		hj::CTrack3DResult curResult = 
 			pParams->pAssociator->Run(vecTrack2DResults, vecMatFrames, nFrameIdx);
 
-		// DEBUG
-		if (14 == nFrameIdx)
-		{
-			int a = 0;
-		}
-
 		// evaluation
 		if (bEvaluate)
 		{
@@ -205,6 +198,19 @@ unsigned int __stdcall AssociationWork(void *data)
 
 		/* request new frame/tracklets */
 		pParams->pMainController->WakeupGDTThreads();
+
+		bool bTerminated = true;
+		for (int i = 0; i < MAX_NUM_SAME_THREAD; i++)
+		{
+			if (!gArrGDTThreadRun[i]) {	continue; }
+			bTerminated = false;
+			break;
+		}
+		if (bTerminated)
+		{
+			hj::printf_debug("  >> terminate association thread\n");
+			break;
+		}
 		SuspendThread(GetCurrentThread());
 		hj::printf_debug("  >> suspend association thread\n");
 	}
@@ -261,7 +267,7 @@ bool CMainController::Initialize(std::string _strParamXMLPath)
 
 	/* instantiate each modules */	
 	vecFrameGrabbers_.resize(numCameras_);	
-	//vecDetectors_.resize(numCameras_);
+	vecDetectors_.resize(numCameras_);
 	vecMultiTracker2Ds_.resize(numCameras_);
 	for (int camIdx = 0; camIdx < numCameras_; camIdx++)
 	{
@@ -269,12 +275,12 @@ bool CMainController::Initialize(std::string _strParamXMLPath)
 		vecFrameGrabbers_[camIdx].Initialize(
 			camIdx, cDataManager_.GetFrameGrabberParams(camIdx));
 
-		//// detectors
-		//if (bDetect_)
-		//{
-		//	vecDetectors_[camIdx].Initialize(
-		//		cDataManager_.GetDetect2DParams(camIdx));
-		//}
+		// detectors
+		if (bDetect_)
+		{
+			vecDetectors_[camIdx].Initialize(
+				cDataManager_.GetDetect2DParams(camIdx));
+		}
 
 		// 2D trackers
 		vecMultiTracker2Ds_[camIdx].Initialize(
@@ -312,7 +318,7 @@ bool CMainController::Initialize(std::string _strParamXMLPath)
 		gStGDTThreadParams[camIdx].pMainController = this;
 		gStGDTThreadParams[camIdx].pDataManager    = &cDataManager_;
 		gStGDTThreadParams[camIdx].pGrabber        = &vecFrameGrabbers_[camIdx];
-		//gStGDTThreadParams[camIdx].pDetector       = &vecDetectors_[camIdx];  // TODO: replace this with a real detector
+		gStGDTThreadParams[camIdx].pDetector       = &vecDetectors_[camIdx];  // TODO: replace this with a real detector
 		gStGDTThreadParams[camIdx].pTracker        = &vecMultiTracker2Ds_[camIdx];
 
 		vecHGDTThreads_[camIdx] = (HANDLE)_beginthreadex(

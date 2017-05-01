@@ -161,6 +161,7 @@
     <ClCompile Include="Associator3D.cpp" />
     <ClCompile Include="CameraModel.cpp" />
     <ClCompile Include="DataManager.cpp" />
+    <ClCompile Include="DetectorCrosstalk.cpp" />
     <ClCompile Include="Evaluator.cpp" />
     <ClCompile Include="FrameGrabber.cpp" />
     <ClCompile Include="GraphSolver.cpp" />
@@ -174,16 +175,19 @@
     <ClCompile Include="HungarianMethod.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainController.cpp" />
+    <ClCompile Include="mxArray.cpp" />
     <ClCompile Include="Point3DSmoother.cpp" />
     <ClCompile Include="pugixml.cpp" />
     <ClCompile Include="SCMTTracker.cpp" />
     <ClCompile Include="SGSmoother.cpp" />
     <ClCompile Include="types_3D.cpp" />
+    <ClCompile Include="wrappers.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Associator3D.h" />
     <ClInclude Include="CameraModel.h" />
     <ClInclude Include="DataManager.h" />
+    <ClInclude Include="DetectorCrosstalk.hpp" />
     <ClInclude Include="Evaluator.h" />
     <ClInclude Include="FrameGrabber.h" />
     <ClInclude Include="GraphSolver.h" />
@@ -196,13 +200,16 @@
     <ClInclude Include="haanju_visualize.hpp" />
     <ClInclude Include="HungarianMethod.h" />
     <ClInclude Include="MainController.h" />
+    <ClInclude Include="mxArray.h" />
     <ClInclude Include="Point3DSmoother.h" />
     <ClInclude Include="pugiconfig.hpp" />
     <ClInclude Include="pugixml.hpp" />
     <ClInclude Include="SCMTTracker.h" />
     <ClInclude Include="SGSmoother.h" />
+    <ClInclude Include="sse.hpp" />
     <ClInclude Include="types.hpp" />
     <ClInclude Include="types_3D.h" />
+    <ClInclude Include="wrappers.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="data\settings.xml">

@@ -64,6 +64,15 @@
     <ClCompile Include="Evaluator.cpp">
       <Filter>Evaluator</Filter>
     </ClCompile>
+    <ClCompile Include="DetectorCrosstalk.cpp">
+      <Filter>2D Detection</Filter>
+    </ClCompile>
+    <ClCompile Include="mxArray.cpp">
+      <Filter>Helpers\Detection Related</Filter>
+    </ClCompile>
+    <ClCompile Include="wrappers.cpp">
+      <Filter>Helpers\Detection Related</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="2D Tracking">
@@ -107,6 +116,12 @@
     </Filter>
     <Filter Include="Evaluator">
       <UniqueIdentifier>{7cdef428-456b-4e95-a447-655cedc74ecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2D Detection">
+      <UniqueIdentifier>{123095c8-7842-43e6-b1f2-1691e4f9a5ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Helpers\Detection Related">
+      <UniqueIdentifier>{45df1781-83f4-4852-bcea-a986698ee4b3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +190,18 @@
     </ClInclude>
     <ClInclude Include="Evaluator.h">
       <Filter>Evaluator</Filter>
+    </ClInclude>
+    <ClInclude Include="DetectorCrosstalk.hpp">
+      <Filter>2D Detection</Filter>
+    </ClInclude>
+    <ClInclude Include="mxArray.h">
+      <Filter>Helpers\Detection Related</Filter>
+    </ClInclude>
+    <ClInclude Include="sse.hpp">
+      <Filter>Helpers\Detection Related</Filter>
+    </ClInclude>
+    <ClInclude Include="wrappers.hpp">
+      <Filter>Helpers\Detection Related</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
