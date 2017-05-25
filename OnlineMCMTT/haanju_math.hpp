@@ -58,7 +58,7 @@ double  MinDistanceBetweenPointSets(std::vector<hj::Point2D> &_vecPoints1, std::
  Return Values:
 	- the median value
 ************************************************************************/
-template<typename T>T hj::Median(std::vector<T> vector)
+template<typename T>T Median(std::vector<T> vector)
 {
 	assert(0 < vector.size());
 	std::sort(vector.begin(), vector.end());
